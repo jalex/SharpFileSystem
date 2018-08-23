@@ -1,12 +1,12 @@
-using System.Reflection;
+﻿using System.Reflection;
 
 [assembly: AssemblyProduct("SharpFileSystem")]
 
-[assembly: AssemblyCompany("Bob van der Linden")]
-[assembly: AssemblyCopyright("Copyright © 2010")]
+[assembly: AssemblyCompany("Jalex")]
+[assembly: AssemblyCopyright("Copyright © 2018")]
 
 #if DEBUG
- [assembly: AssemblyConfiguration("Debug")]
+[assembly: AssemblyConfiguration("Debug")]
 #else
 [assembly: AssemblyConfiguration("Release")]
 #endif

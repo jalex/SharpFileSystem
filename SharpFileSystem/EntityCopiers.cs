@@ -1,13 +1,12 @@
-using SharpFileSystem.Collections;
+﻿using SharpFileSystem.Collections;
 
-namespace SharpFileSystem
-{
-    public static class EntityCopiers
-    {
+namespace SharpFileSystem {
+
+    public static class EntityCopiers {
+
         public static TypeCombinationDictionary<IEntityCopier> Registration { get; private set; }
 
-        static EntityCopiers()
-        {
+        static EntityCopiers() {
             Registration = new TypeCombinationDictionary<IEntityCopier>();
         }
     }
