@@ -8,14 +8,22 @@ namespace SharpFileSystem.FileSystems.Resources {
 
     public class EmbeddedResourceFileSystem : IFileSystem {
 
-        public Assembly Assembly { get; private set; }
+        #region properties
 
+        public Assembly Assembly { get; }
+
+        #endregion
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public EmbeddedResourceFileSystem(Assembly assembly) {
-            Assembly = assembly;
+            this.Assembly = assembly;
         }
 
         public ICollection<FileSystemPath> GetEntities(FileSystemPath path) {
             if(!path.IsRoot) throw new DirectoryNotFoundException();
+
             return Assembly.GetManifestResourceNames().Select(name => FileSystemPath.Root.AppendFile(name)).ToArray();
         }
 
@@ -26,6 +34,7 @@ namespace SharpFileSystem.FileSystems.Resources {
         public Stream OpenFile(FileSystemPath path, FileAccess access) {
             if(access == FileAccess.Write) throw new NotSupportedException();
             if(path.IsDirectory || path.ParentPath != FileSystemPath.Root) throw new FileNotFoundException();
+
             return Assembly.GetManifestResourceStream(path.EntityName);
         }
 

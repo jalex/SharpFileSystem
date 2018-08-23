@@ -31,12 +31,6 @@ namespace SharpFileSystem.FileSystems {
             return Mounts.First(pair => pair.Key == path || pair.Key.IsParentOf(path));
         }
 
-        public void Dispose() {
-            foreach(var mount in Mounts.Select(p => p.Value)) {
-                mount.Dispose();
-            }
-        }
-
         public ICollection<FileSystemPath> GetEntities(FileSystemPath path) {
             var pair = Get(path);
             var entities = pair.Value.GetEntities(path.IsRoot ? path : path.RemoveParent(pair.Key));
@@ -66,6 +60,12 @@ namespace SharpFileSystem.FileSystems {
         public void Delete(FileSystemPath path) {
             var pair = Get(path);
             pair.Value.Delete(path.RemoveParent(pair.Key));
+        }
+
+        public void Dispose() {
+            foreach(var mount in Mounts.Select(p => p.Value)) {
+                mount.Dispose();
+            }
         }
     }
 }

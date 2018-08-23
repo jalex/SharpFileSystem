@@ -8,7 +8,15 @@ namespace SharpFileSystem.FileSystems.SharpZipLib {
 
     public class SharpZipLibFileSystem : IFileSystem {
 
-        public ZipFile ZipFile { get; set; }
+        #region properties
+
+        public ZipFile ZipFile { get; }
+
+        #endregion
+
+        private SharpZipLibFileSystem(ZipFile zipFile) {
+            this.ZipFile = zipFile;
+        }
 
         public static SharpZipLibFileSystem Open(Stream s) {
             return new SharpZipLibFileSystem(new ZipFile(s));
@@ -18,22 +26,13 @@ namespace SharpFileSystem.FileSystems.SharpZipLib {
             return new SharpZipLibFileSystem(ZipFile.Create(s));
         }
 
-        private SharpZipLibFileSystem(ZipFile zipFile) {
-            ZipFile = zipFile;
-        }
-
-        public void Dispose() {
-            if(ZipFile.IsUpdating) ZipFile.CommitUpdate();
-            ZipFile.Close();
-        }
-
         protected FileSystemPath ToPath(ZipEntry entry) {
-            return FileSystemPath.Parse(FileSystemPath.DirectorySeparator + entry.Name);
+            return FileSystemPath.Parse(FileSystemPath.DirectorySeparatorChar + entry.Name);
         }
 
         protected string ToEntryPath(FileSystemPath path) {
             // Remove heading '/' from path.
-            return path.Path.TrimStart(FileSystemPath.DirectorySeparator);
+            return path.Path.TrimStart(FileSystemPath.DirectorySeparatorChar);
         }
 
         protected ZipEntry ToEntry(FileSystemPath path) {
@@ -79,11 +78,20 @@ namespace SharpFileSystem.FileSystems.SharpZipLib {
             ZipFile.Delete(ToEntryPath(path));
         }
 
+        public void Dispose() {
+            if(ZipFile.IsUpdating) ZipFile.CommitUpdate();
+            ZipFile.Close();
+        }
+
+        #region sub classes
+
         public class MemoryZipEntry : MemoryFileSystem.MemoryFile, IStaticDataSource {
 
             public Stream GetSource() {
                 return new MemoryFileSystem.MemoryFileStream(this);
             }
         }
+
+        #endregion
     }
 }

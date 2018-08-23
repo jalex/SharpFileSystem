@@ -30,10 +30,6 @@ namespace SharpFileSystem.FileSystems {
             return path.RemoveParent(Root);
         }
 
-        public void Dispose() {
-            FileSystem.Dispose();
-        }
-
         public ICollection<FileSystemPath> GetEntities(FileSystemPath path) {
             var paths = FileSystem.GetEntities(AppendRoot(path));
             return new EnumerableCollection<FileSystemPath>(paths.Select(p => RemoveRoot(p)), paths.Count);
@@ -57,6 +53,10 @@ namespace SharpFileSystem.FileSystems {
 
         public void Delete(FileSystemPath path) {
             FileSystem.Delete(AppendRoot(path));
+        }
+
+        public void Dispose() {
+            FileSystem.Dispose();
         }
     }
 }
