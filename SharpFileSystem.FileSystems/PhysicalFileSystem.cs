@@ -29,7 +29,7 @@ namespace SharpFileSystem.FileSystems {
 
         public FileSystemPath GetVirtualFilePath(string physicalPath) {
             if(!physicalPath.StartsWith(PhysicalRoot, StringComparison.InvariantCultureIgnoreCase)) {
-                throw new ArgumentException("The specified path is not member of the PhysicalRoot.", "physicalPath");
+                throw new ArgumentException("The specified path is not member of the PhysicalRoot.", nameof(physicalPath));
             }
             string virtualPath = FileSystemPath.DirectorySeparatorChar + physicalPath.Remove(0, PhysicalRoot.Length).Replace(Path.DirectorySeparatorChar, FileSystemPath.DirectorySeparatorChar);
             return FileSystemPath.Parse(virtualPath);
@@ -37,7 +37,7 @@ namespace SharpFileSystem.FileSystems {
 
         public FileSystemPath GetVirtualDirectoryPath(string physicalPath) {
             if(!physicalPath.StartsWith(PhysicalRoot, StringComparison.InvariantCultureIgnoreCase)) {
-                throw new ArgumentException("The specified path is not member of the PhysicalRoot.", "physicalPath");
+                throw new ArgumentException("The specified path is not member of the PhysicalRoot.", nameof(physicalPath));
             }
             string virtualPath = FileSystemPath.DirectorySeparatorChar + physicalPath.Remove(0, PhysicalRoot.Length).Replace(Path.DirectorySeparatorChar, FileSystemPath.DirectorySeparatorChar);
             if(virtualPath[virtualPath.Length - 1] != FileSystemPath.DirectorySeparatorChar) virtualPath += FileSystemPath.DirectorySeparatorChar;
@@ -58,17 +58,19 @@ namespace SharpFileSystem.FileSystems {
         }
 
         public Stream CreateFile(FileSystemPath path) {
-            if(!path.IsFile) throw new ArgumentException("The specified path is not a file.", "path");
-            return System.IO.File.Create(GetPhysicalPath(path));
+            if(!path.IsFile) throw new ArgumentException("The specified path is not a file.", nameof(path));
+            var physicalPath = GetPhysicalPath(path);
+            EnsureDirectoryExist(physicalPath);
+            return System.IO.File.Create(physicalPath);
         }
 
         public Stream OpenFile(FileSystemPath path, FileAccess access) {
-            if(!path.IsFile) throw new ArgumentException("The specified path is not a file.", "path");
+            if(!path.IsFile) throw new ArgumentException("The specified path is not a file.", nameof(path));
             return System.IO.File.Open(GetPhysicalPath(path), FileMode.Open, access);
         }
 
         public void CreateDirectory(FileSystemPath path) {
-            if(!path.IsDirectory) throw new ArgumentException("The specified path is not a directory.", "path");
+            if(!path.IsDirectory) throw new ArgumentException("The specified path is not a directory.", nameof(path));
             System.IO.Directory.CreateDirectory(GetPhysicalPath(path));
         }
 
@@ -81,6 +83,11 @@ namespace SharpFileSystem.FileSystems {
         }
 
         public void Dispose() {
+        }
+
+        void EnsureDirectoryExist(string path) {
+            var dir = Path.GetDirectoryName(path);
+            System.IO.Directory.CreateDirectory(dir);
         }
     }
 }

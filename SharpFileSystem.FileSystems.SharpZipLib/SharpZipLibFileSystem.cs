@@ -61,7 +61,10 @@ namespace SharpFileSystem.FileSystems.SharpZipLib {
 
         public Stream CreateFile(FileSystemPath path) {
             var entry = new MemoryZipEntry();
+            ZipFile.BeginUpdate();
             ZipFile.Add(entry, ToEntryPath(path));
+            ZipFile.CommitUpdate();
+
             return entry.GetSource();
         }
 

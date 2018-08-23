@@ -15,7 +15,7 @@ namespace SharpFileSystem.FileSystems.SevenZip {
         /// <summary>
         /// Constructor
         /// </summary>
-        private SevenZipFileSystem(SevenZipExtractor extractor) {
+        SevenZipFileSystem(SevenZipExtractor extractor) {
             _extractor = extractor;
             foreach(var file in _extractor.ArchiveFileData) {
                 AddEntity(GetVirtualFilePath(file));

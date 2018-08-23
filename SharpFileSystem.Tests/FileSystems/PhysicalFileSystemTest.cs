@@ -107,5 +107,10 @@ namespace SharpFileSystem.Tests.FileSystems {
                 );
             }
         }
+
+        [Test]
+        public void CreateFile_WriteContents() {
+            Utils.WriteContents(FileSystem);
+        }
     }
 }

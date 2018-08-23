@@ -68,5 +68,10 @@ namespace SharpFileSystem.Tests.SharpZipLib {
             Assert.IsFalse(fileSystem.Exists(FileSystemPath.Parse("/nonExistingDirectory/")));
             Assert.IsFalse(fileSystem.Exists(FileSystemPath.Parse("/directory/nonExistingFileInDirectory")));
         }
+
+        [Test]
+        public void CreateFile_WriteContents() {
+            Utils.WriteContents(fileSystem);
+        }
     }
 }
