@@ -3,40 +3,42 @@ using System.IO;
 
 namespace SharpFileSystem.FileSystems {
 
-    public class SealedFileSystem : IFileSystem {
+    public class SealedFileSystem: IFileSystem {
+        readonly IFileSystem _parent;
 
-        private IFileSystem Parent { get; set; }
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public SealedFileSystem(IFileSystem parent) {
-            Parent = parent;
+            _parent = parent;
         }
 
         public ICollection<FileSystemPath> GetEntities(FileSystemPath path) {
-            return Parent.GetEntities(path);
+            return _parent.GetEntities(path);
         }
 
         public bool Exists(FileSystemPath path) {
-            return Parent.Exists(path);
+            return _parent.Exists(path);
         }
 
         public Stream CreateFile(FileSystemPath path) {
-            return Parent.CreateFile(path);
+            return _parent.CreateFile(path);
         }
 
         public Stream OpenFile(FileSystemPath path, FileAccess access) {
-            return Parent.OpenFile(path, access);
+            return _parent.OpenFile(path, access);
         }
 
         public void CreateDirectory(FileSystemPath path) {
-            Parent.CreateDirectory(path);
+            _parent.CreateDirectory(path);
         }
 
         public void Delete(FileSystemPath path) {
-            Parent.Delete(path);
+            _parent.Delete(path);
         }
 
         public void Dispose() {
-            Parent.Dispose();
+            _parent.Dispose();
         }
     }
 }

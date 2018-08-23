@@ -7,13 +7,23 @@ namespace SharpFileSystem.FileSystems {
 
     public class FileSystemMounter : IFileSystem {
 
-        public ICollection<KeyValuePair<FileSystemPath, IFileSystem>> Mounts { get; private set; }
+        #region properties
 
+        public ICollection<KeyValuePair<FileSystemPath, IFileSystem>> Mounts { get; }
+
+        #endregion
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public FileSystemMounter(IEnumerable<KeyValuePair<FileSystemPath, IFileSystem>> mounts) {
-            Mounts = new SortedList<FileSystemPath, IFileSystem>(new InverseComparer<FileSystemPath>(Comparer<FileSystemPath>.Default));
+            this.Mounts = new SortedList<FileSystemPath, IFileSystem>(new InverseComparer<FileSystemPath>(Comparer<FileSystemPath>.Default));
             foreach(var mount in mounts) Mounts.Add(mount);
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public FileSystemMounter(params KeyValuePair<FileSystemPath, IFileSystem>[] mounts): this((IEnumerable<KeyValuePair<FileSystemPath, IFileSystem>>)mounts) {
         }
 

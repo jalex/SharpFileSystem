@@ -5,16 +5,17 @@ namespace SharpFileSystem {
 
     public interface ITypeDictionary<T> : ICollection<T> {
 
-        #region Indexers
+        #region indexers
 
         IEnumerable<T> this[Type type] { get; }
 
         #endregion
 
-        #region Query Methods
+        #region query methods
 
         IEnumerable<T> Get(Type type);
         IEnumerable<T> GetExplicit(Type type);
+
         T GetSingle(Type type);
         T GetSingleExplicit(Type type);
 

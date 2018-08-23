@@ -7,20 +7,24 @@ namespace SharpFileSystem.FileSystems {
 
     public class MergedFileSystem : IFileSystem {
 
-        public IEnumerable<IFileSystem> FileSystems { get; private set; }
+        #region properties
 
+        public IEnumerable<IFileSystem> FileSystems { get; }
+
+        #endregion
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public MergedFileSystem(IEnumerable<IFileSystem> fileSystems) {
-            FileSystems = fileSystems.ToArray();
+            this.FileSystems = fileSystems.ToArray();
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public MergedFileSystem(params IFileSystem[] fileSystems) {
             FileSystems = fileSystems.ToArray();
-        }
-
-        public void Dispose() {
-            foreach(var fs in FileSystems) {
-                fs.Dispose();
-            }
         }
 
         public ICollection<FileSystemPath> GetEntities(FileSystemPath path) {
@@ -62,6 +66,12 @@ namespace SharpFileSystem.FileSystems {
         public void Delete(FileSystemPath path) {
             foreach(var fs in FileSystems.Where(fs => fs.Exists(path))) {
                 fs.Delete(path);
+            }
+        }
+
+        public void Dispose() {
+            foreach(var fs in FileSystems) {
+                fs.Dispose();
             }
         }
     }

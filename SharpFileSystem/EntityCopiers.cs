@@ -4,10 +4,7 @@ namespace SharpFileSystem {
 
     public static class EntityCopiers {
 
-        public static TypeCombinationDictionary<IEntityCopier> Registration { get; private set; }
+        public static readonly TypeCombinationDictionary<IEntityCopier> Registration = new TypeCombinationDictionary<IEntityCopier>();
 
-        static EntityCopiers() {
-            Registration = new TypeCombinationDictionary<IEntityCopier>();
-        }
     }
 }

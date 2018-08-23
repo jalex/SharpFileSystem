@@ -5,29 +5,35 @@ using System.Linq;
 
 namespace SharpFileSystem.FileSystems {
 
-    public abstract class SeamlessArchiveFileSystem : IFileSystem {
-        public IFileSystem FileSystem { get; private set; }
+    public abstract class SeamlessArchiveFileSystem: IFileSystem {
+        readonly FileSystemUsage _rootUsage;
+        readonly IDictionary<File, FileSystemUsage> _usedArchives = new Dictionary<File, FileSystemUsage>();
 
-        public static readonly char ArchiveDirectorySeparator = '#';
+        #region properties
 
-        private FileSystemUsage _rootUsage;
-        private IDictionary<File, FileSystemUsage> _usedArchives = new Dictionary<File, FileSystemUsage>();
+        public IFileSystem FileSystem { get; }
 
+        #endregion
+
+        public const char ArchiveDirectorySeparator = '#';
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public SeamlessArchiveFileSystem(IFileSystem fileSystem) {
-            FileSystem = fileSystem;
             _rootUsage = new FileSystemUsage() {
                 Owner = this,
                 FileSystem = FileSystem,
                 ArchiveFile = null
             };
+            this.FileSystem = fileSystem;
         }
 
         public void UnuseFileSystem(FileSystemReference reference) {
             // When root filesystem was used.
             if(reference.Usage.ArchiveFile == null) return;
 
-            FileSystemUsage usage;
-            if(!_usedArchives.TryGetValue(reference.Usage.ArchiveFile, out usage)) throw new ArgumentException("The specified reference is not valid.");
+            if(!_usedArchives.TryGetValue(reference.Usage.ArchiveFile, out var usage)) throw new ArgumentException("The specified reference is not valid.");
             if(!usage.References.Remove(reference)) throw new ArgumentException("The specified reference does not exist.");
             if(usage.References.Count == 0) {
                 _usedArchives.Remove(usage.ArchiveFile);
@@ -38,25 +44,25 @@ namespace SharpFileSystem.FileSystems {
 
         protected abstract bool IsArchiveFile(IFileSystem fileSystem, FileSystemPath path);
 
-        private FileSystemPath ArchiveFileToDirectory(FileSystemPath path) {
+        FileSystemPath ArchiveFileToDirectory(FileSystemPath path) {
             if(!path.IsFile) throw new ArgumentException("The specified path is not a file.");
             return path.ParentPath.AppendDirectory(path.EntityName + ArchiveDirectorySeparator);
         }
 
-        private FileSystemPath GetRelativePath(FileSystemPath path) {
+        FileSystemPath GetRelativePath(FileSystemPath path) {
             string s = path.ToString();
-            int sindex = s.LastIndexOf(ArchiveDirectorySeparator.ToString() + FileSystemPath.DirectorySeparator);
+            int sindex = s.LastIndexOf(ArchiveDirectorySeparator.ToString() + FileSystemPath.DirectorySeparatorChar);
             if(sindex < 0) return path;
             return FileSystemPath.Parse(s.Substring(sindex + 1));
         }
 
         protected bool HasArchive(FileSystemPath path) {
-            return path.ToString().LastIndexOf(ArchiveDirectorySeparator.ToString() + FileSystemPath.DirectorySeparator) >= 0;
+            return path.ToString().LastIndexOf(ArchiveDirectorySeparator.ToString() + FileSystemPath.DirectorySeparatorChar) >= 0;
         }
 
         protected bool TryGetArchivePath(FileSystemPath path, out FileSystemPath archivePath) {
             string p = path.ToString();
-            int sindex = p.LastIndexOf(ArchiveDirectorySeparator.ToString() + FileSystemPath.DirectorySeparator);
+            int sindex = p.LastIndexOf(ArchiveDirectorySeparator.ToString() + FileSystemPath.DirectorySeparatorChar);
             if(sindex < 0) {
                 archivePath = path;
                 return false;
@@ -71,33 +77,31 @@ namespace SharpFileSystem.FileSystems {
             return new FileSystemReference(_rootUsage);
         }
 
-        private FileSystemReference CreateArchiveReference(FileSystemPath archiveFile) {
+        FileSystemReference CreateArchiveReference(FileSystemPath archiveFile) {
             return CreateReference((File)GetActualLocation(archiveFile));
         }
 
-        private FileSystemReference CreateReference(File file) {
+        FileSystemReference CreateReference(File file) {
             var usage = GetArchiveFs(file);
             var reference = new FileSystemReference(usage);
             usage.References.Add(reference);
             return reference;
         }
 
-        private FileSystemEntity GetActualLocation(FileSystemPath path) {
-            FileSystemPath archivePath;
-            if(!TryGetArchivePath(path, out archivePath)) return FileSystemEntity.Create(FileSystem, path);
+        FileSystemEntity GetActualLocation(FileSystemPath path) {
+            if(!TryGetArchivePath(path, out var archivePath)) return FileSystemEntity.Create(FileSystem, path);
             var archiveFile = (File)GetActualLocation(archivePath);
-            FileSystemUsage usage = GetArchiveFs(archiveFile);
+            var usage = GetArchiveFs(archiveFile);
             return FileSystemEntity.Create(usage.FileSystem, GetRelativePath(path));
         }
 
-        private FileSystemUsage GetArchiveFs(File archiveFile) {
-            FileSystemUsage usage;
-            if(_usedArchives.TryGetValue(archiveFile, out usage)) {
+        FileSystemUsage GetArchiveFs(File archiveFile) {
+            if(_usedArchives.TryGetValue(archiveFile, out var usage)) {
                 //System.Diagnostics.Debug.WriteLine("Open archives: " + _usedArchives.Count);
                 return usage;
             }
 
-            IFileSystem archiveFs = CreateArchiveFileSystem(archiveFile);
+            var archiveFs = CreateArchiveFileSystem(archiveFile);
             usage = new FileSystemUsage {
                 Owner = this,
                 FileSystem = archiveFs,
@@ -114,8 +118,7 @@ namespace SharpFileSystem.FileSystems {
             using(var r = Refer(path)) {
                 var fileSystem = r.FileSystem;
 
-                FileSystemPath parentPath;
-                if(TryGetArchivePath(path, out parentPath)) {
+                if(TryGetArchivePath(path, out var parentPath)) {
                     parentPath = ArchiveFileToDirectory(parentPath);
                 } else {
                     parentPath = FileSystemPath.Root;
@@ -143,9 +146,9 @@ namespace SharpFileSystem.FileSystems {
             return new SafeReferenceStream(s, r);
         }
 
-        #region Not implemented
+        #region not implemented
 
-        public System.IO.Stream CreateFile(FileSystemPath path) {
+        public Stream CreateFile(FileSystemPath path) {
             var r = Refer(path);
             var s = r.FileSystem.CreateFile(GetRelativePath(path));
             return new SafeReferenceStream(s, r);
@@ -162,6 +165,7 @@ namespace SharpFileSystem.FileSystems {
                 r.FileSystem.Delete(GetRelativePath(path));
             }
         }
+
         #endregion
 
         public void Dispose() {
@@ -171,6 +175,8 @@ namespace SharpFileSystem.FileSystems {
             FileSystem.Dispose();
         }
 
+        #region sub classes
+
         public class DummyDisposable : IDisposable {
 
             public void Dispose() {
@@ -178,13 +184,14 @@ namespace SharpFileSystem.FileSystems {
         }
 
         public class FileSystemReference : IDisposable {
+            public FileSystemUsage Usage { get; }
+            public IFileSystem FileSystem => Usage.FileSystem;
 
-            public FileSystemUsage Usage { get; set; }
-
-            public IFileSystem FileSystem { get { return Usage.FileSystem; } }
-
+            /// <summary>
+            /// Constructor
+            /// </summary>
             public FileSystemReference(FileSystemUsage usage) {
-                Usage = usage;
+                this.Usage = usage;
             }
 
             public void Dispose() {
@@ -196,17 +203,16 @@ namespace SharpFileSystem.FileSystems {
             public SeamlessArchiveFileSystem Owner { get; set; }
             public File ArchiveFile { get; set; }
             public IFileSystem FileSystem { get; set; }
-            public ICollection<FileSystemReference> References { get; set; }
-
-            public FileSystemUsage() {
-                References = new LinkedList<FileSystemReference>();
-            }
+            public ICollection<FileSystemReference> References { get; } = new LinkedList<FileSystemReference>();
         }
 
-        public class SafeReferenceStream : Stream {
-            private Stream _stream;
-            private FileSystemReference _reference;
+        public class SafeReferenceStream: Stream {
+            readonly Stream _stream;
+            readonly FileSystemReference _reference;
 
+            /// <summary>
+            /// Constructor
+            /// </summary>
             public SafeReferenceStream(Stream stream, FileSystemReference reference) {
                 _stream = stream;
                 _reference = reference;
@@ -232,17 +238,17 @@ namespace SharpFileSystem.FileSystems {
                 _stream.Write(buffer, offset, count);
             }
 
-            public override bool CanRead { get { return _stream.CanRead; } }
+            public override bool CanRead => _stream.CanRead;
 
-            public override bool CanSeek { get { return _stream.CanSeek; } }
+            public override bool CanSeek => _stream.CanSeek;
 
-            public override bool CanWrite { get { return _stream.CanWrite; } }
+            public override bool CanWrite => _stream.CanWrite;
 
-            public override long Length { get { return _stream.Length; } }
+            public override long Length => _stream.Length;
 
             public override long Position {
-                get { return _stream.Position; }
-                set { _stream.Position = value; }
+                get => _stream.Position;
+                set => _stream.Position = value;
             }
 
             public override void Close() {
@@ -250,6 +256,8 @@ namespace SharpFileSystem.FileSystems {
                 _reference.Dispose();
             }
         }
+
+        #endregion
     }
 }
 

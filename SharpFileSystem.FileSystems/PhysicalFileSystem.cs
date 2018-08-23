@@ -8,25 +8,30 @@ namespace SharpFileSystem.FileSystems {
 
     public class PhysicalFileSystem : IFileSystem {
 
-        #region Internals
+        #region properties
 
-        public string PhysicalRoot { get; private set; }
+        public string PhysicalRoot { get; }
 
+        #endregion
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public PhysicalFileSystem(string physicalRoot) {
             if(!Path.IsPathRooted(physicalRoot)) physicalRoot = Path.GetFullPath(physicalRoot);
             if(physicalRoot[physicalRoot.Length - 1] != Path.DirectorySeparatorChar) physicalRoot = physicalRoot + Path.DirectorySeparatorChar;
-            PhysicalRoot = physicalRoot;
+            this.PhysicalRoot = physicalRoot;
         }
 
         public string GetPhysicalPath(FileSystemPath path) {
-            return Path.Combine(PhysicalRoot, path.ToString().Remove(0, 1).Replace(FileSystemPath.DirectorySeparator, Path.DirectorySeparatorChar));
+            return Path.Combine(PhysicalRoot, path.ToString().Remove(0, 1).Replace(FileSystemPath.DirectorySeparatorChar, Path.DirectorySeparatorChar));
         }
 
         public FileSystemPath GetVirtualFilePath(string physicalPath) {
             if(!physicalPath.StartsWith(PhysicalRoot, StringComparison.InvariantCultureIgnoreCase)) {
                 throw new ArgumentException("The specified path is not member of the PhysicalRoot.", "physicalPath");
             }
-            string virtualPath = FileSystemPath.DirectorySeparator + physicalPath.Remove(0, PhysicalRoot.Length).Replace(Path.DirectorySeparatorChar, FileSystemPath.DirectorySeparator);
+            string virtualPath = FileSystemPath.DirectorySeparatorChar + physicalPath.Remove(0, PhysicalRoot.Length).Replace(Path.DirectorySeparatorChar, FileSystemPath.DirectorySeparatorChar);
             return FileSystemPath.Parse(virtualPath);
         }
 
@@ -34,12 +39,10 @@ namespace SharpFileSystem.FileSystems {
             if(!physicalPath.StartsWith(PhysicalRoot, StringComparison.InvariantCultureIgnoreCase)) {
                 throw new ArgumentException("The specified path is not member of the PhysicalRoot.", "physicalPath");
             }
-            string virtualPath = FileSystemPath.DirectorySeparator + physicalPath.Remove(0, PhysicalRoot.Length).Replace(Path.DirectorySeparatorChar, FileSystemPath.DirectorySeparator);
-            if(virtualPath[virtualPath.Length - 1] != FileSystemPath.DirectorySeparator) virtualPath += FileSystemPath.DirectorySeparator;
+            string virtualPath = FileSystemPath.DirectorySeparatorChar + physicalPath.Remove(0, PhysicalRoot.Length).Replace(Path.DirectorySeparatorChar, FileSystemPath.DirectorySeparatorChar);
+            if(virtualPath[virtualPath.Length - 1] != FileSystemPath.DirectorySeparatorChar) virtualPath += FileSystemPath.DirectorySeparatorChar;
             return FileSystemPath.Parse(virtualPath);
         }
-
-        #endregion
 
         public ICollection<FileSystemPath> GetEntities(FileSystemPath path) {
             string physicalPath = GetPhysicalPath(path);

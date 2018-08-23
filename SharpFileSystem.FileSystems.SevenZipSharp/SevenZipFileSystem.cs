@@ -9,10 +9,12 @@ using SharpFileSystem.IO;
 namespace SharpFileSystem.FileSystems.SevenZip {
 
     public class SevenZipFileSystem : IFileSystem {
-        private SevenZipExtractor _extractor;
+        readonly SevenZipExtractor _extractor;
+        readonly ICollection<FileSystemPath> _entities = new List<FileSystemPath>();
 
-        private ICollection<FileSystemPath> _entities = new List<FileSystemPath>();
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
         private SevenZipFileSystem(SevenZipExtractor extractor) {
             _extractor = extractor;
             foreach(var file in _extractor.ArchiveFileData) {
@@ -20,9 +22,15 @@ namespace SharpFileSystem.FileSystems.SevenZip {
             }
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public SevenZipFileSystem(Stream stream) : this(new SevenZipExtractor(stream)) {
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public SevenZipFileSystem(string physicalPath) : this(new SevenZipExtractor(physicalPath)) {
         }
 
@@ -36,13 +44,13 @@ namespace SharpFileSystem.FileSystems.SevenZip {
         }
 
         public FileSystemPath GetVirtualFilePath(ArchiveFileInfo archiveFile) {
-            string path = FileSystemPath.DirectorySeparator + archiveFile.FileName.Replace(Path.DirectorySeparatorChar, FileSystemPath.DirectorySeparator);
-            if(archiveFile.IsDirectory && path[path.Length - 1] != FileSystemPath.DirectorySeparator) path += FileSystemPath.DirectorySeparator;
+            string path = FileSystemPath.DirectorySeparatorChar + archiveFile.FileName.Replace(Path.DirectorySeparatorChar, FileSystemPath.DirectorySeparatorChar);
+            if(archiveFile.IsDirectory && path[path.Length - 1] != FileSystemPath.DirectorySeparatorChar) path += FileSystemPath.DirectorySeparatorChar;
             return FileSystemPath.Parse(path);
         }
 
         public ICollection<FileSystemPath> GetEntities(FileSystemPath path) {
-            if(!path.IsDirectory) throw new ArgumentException("The specified path is not a directory.", "path");
+            if(!path.IsDirectory) throw new ArgumentException("The specified path is not a directory.", nameof(path));
             return _entities.Where(p => !p.IsRoot && p.ParentPath.Equals(path)).ToArray();
         }
 

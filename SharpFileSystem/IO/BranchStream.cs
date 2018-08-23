@@ -3,27 +3,32 @@
 namespace SharpFileSystem.IO {
 
     public class BranchStream : Stream {
-        private Stream _stream;
-        private Stream _writeStream;
-        private Stream _readStream;
+        readonly Stream _stream;
+        readonly Stream _writeStream;
+        readonly Stream _readStream;
 
-        public override bool CanRead { get { return _stream.CanRead; } }
-
-        public override bool CanSeek { get { return _stream.CanSeek; } }
-
-        public override bool CanWrite { get { return _stream.CanWrite; } }
-
-        public override long Length { get { return _stream.Length; } }
-
-        public override long Position {
-            get { return _stream.Position; }
-            set { _stream.Position = value; }
-        }
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public BranchStream(Stream stream, Stream writeStream, Stream readStream) {
             _stream = stream;
             _writeStream = writeStream;
             _readStream = readStream;
+        }
+
+        #region Stream members
+
+        public override bool CanRead => _stream.CanRead;
+
+        public override bool CanSeek => _stream.CanSeek;
+
+        public override bool CanWrite => _stream.CanWrite;
+
+        public override long Length => _stream.Length;
+
+        public override long Position {
+            get => _stream.Position;
+            set => _stream.Position = value;
         }
 
         public override int Read(byte[] buffer, int offset, int count) {
@@ -57,5 +62,7 @@ namespace SharpFileSystem.IO {
             _readStream.Close();
             _writeStream.Close();
         }
+
+        #endregion
     }
 }

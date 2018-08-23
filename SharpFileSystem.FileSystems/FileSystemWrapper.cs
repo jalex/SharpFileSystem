@@ -5,10 +5,17 @@ namespace SharpFileSystem.FileSystems {
 
     public class FileSystemWrapper : IFileSystem {
 
-        public IFileSystem Parent { get; private set; }
+        #region properties
 
+        public IFileSystem Parent { get; }
+
+        #endregion
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public FileSystemWrapper(IFileSystem parent) {
-            Parent = parent;
+            this.Parent = parent;
         }
 
         public ICollection<FileSystemPath> GetEntities(FileSystemPath path) {

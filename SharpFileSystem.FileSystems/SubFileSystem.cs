@@ -6,12 +6,20 @@ using SharpFileSystem.Collections;
 namespace SharpFileSystem.FileSystems {
 
     public class SubFileSystem : IFileSystem {
-        public IFileSystem FileSystem { get; private set; }
-        public FileSystemPath Root { get; private set; }
 
+        #region properties
+
+        public IFileSystem FileSystem { get; }
+        public FileSystemPath Root { get; }
+
+        #endregion
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public SubFileSystem(IFileSystem fileSystem, FileSystemPath root) {
-            FileSystem = fileSystem;
-            Root = root;
+            this.FileSystem = fileSystem;
+            this.Root = root;
         }
 
         protected FileSystemPath AppendRoot(FileSystemPath path) {

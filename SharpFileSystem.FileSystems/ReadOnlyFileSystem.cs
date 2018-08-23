@@ -6,10 +6,17 @@ namespace SharpFileSystem.FileSystems {
 
     public class ReadOnlyFileSystem : IFileSystem {
 
-        public IFileSystem FileSystem { get; private set; }
+        #region properties
 
+        public IFileSystem FileSystem { get; }
+
+        #endregion
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public ReadOnlyFileSystem(IFileSystem fileSystem) {
-            FileSystem = fileSystem;
+            this.FileSystem = fileSystem;
         }
 
         public void Dispose() {
