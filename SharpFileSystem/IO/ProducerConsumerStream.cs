@@ -5,21 +5,43 @@ using System.Threading;
 namespace SharpFileSystem.IO {
 
     public class ProducerConsumerStream : Stream {
+        readonly object _readLocker = new object();
+        readonly object _writeLocker = new object();
+        bool _closed = false;
+        bool _isWritingStalled = false;
 
-        public override bool CanRead { get { return true; } }
+        readonly CircularBuffer<byte> _buffer = new CircularBuffer<byte>(4096);
 
-        public override bool CanSeek { get { return false; } }
+        #region properties
 
-        public override bool CanWrite { get { return true; } }
+        bool IsWriteable => WriteableCount > 0;
+
+        long WriteableCount => _buffer.Capacity - _buffer.Size;
+
+        #endregion
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public ProducerConsumerStream() {
+        }
+
+        #region Stream members
+
+        public override bool CanRead => true;
+
+        public override bool CanSeek => false;
+
+        public override bool CanWrite => true;
 
         public override void Flush() {
         }
 
-        public override long Length { get { throw new NotSupportedException(); } }
+        public override long Length => throw new NotSupportedException();
 
         public override long Position {
-            get { throw new NotSupportedException(); }
-            set { throw new NotSupportedException(); }
+            get => throw new NotSupportedException();
+            set  => throw new NotSupportedException();
         }
 
         public override long Seek(long offset, SeekOrigin origin) {
@@ -30,22 +52,6 @@ namespace SharpFileSystem.IO {
             throw new NotSupportedException();
         }
 
-
-
-        object _readLocker = new object();
-        object _writeLocker = new object();
-        bool _closed = false;
-        bool _isWritingStalled = false;
-
-        private CircularBuffer<byte> _buffer = new CircularBuffer<byte>(4096);
-
-        bool IsWriteable { get { return WriteableCount > 0; } }
-
-        long WriteableCount { get { return _buffer.Capacity - _buffer.Size; } }
-
-        public ProducerConsumerStream() {
-        }
-
         public override void Close() {
             _closed = true;
             lock(_readLocker) {
@@ -54,6 +60,7 @@ namespace SharpFileSystem.IO {
             lock(_writeLocker) {
                 Monitor.Pulse(_writeLocker);
             }
+
             base.Close();
         }
 
@@ -99,5 +106,7 @@ namespace SharpFileSystem.IO {
                 }
             }
         }
+
+        #endregion
     }
 }

@@ -4,26 +4,31 @@ using System.IO;
 namespace SharpFileSystem.IO {
 
     public class ReadOnlyStream : Stream {
-        private Stream _stream;
+        readonly Stream _stream;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public ReadOnlyStream(Stream stream) {
             _stream = stream;
         }
 
-        public override bool CanRead { get { return _stream.CanRead; } }
+        #region Stream members
 
-        public override bool CanSeek { get { return false; } }
+        public override bool CanRead => _stream.CanRead;
 
-        public override bool CanWrite { get { return false; } }
+        public override bool CanSeek => false;
+
+        public override bool CanWrite => false;
 
         public override void Flush() {
         }
 
-        public override long Length { get { return _stream.Length; } }
+        public override long Length => _stream.Length;
 
         public override long Position {
-            get { return _stream.Position; }
-            set { _stream.Position = value; }
+            get => _stream.Position;
+            set => _stream.Position = value;
         }
 
         public override int Read(byte[] buffer, int offset, int count) {
@@ -45,5 +50,7 @@ namespace SharpFileSystem.IO {
         public override void Close() {
             _stream.Close();
         }
+
+        #endregion
     }
 }

@@ -5,4 +5,23 @@
     <Description>A virtual file system for .NET written in C#</Description>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="IO\**" />
+    <EmbeddedResource Remove="IO\**" />
+    <None Remove="IO\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="IO\BoundStream.cs" />
+    <Compile Include="IO\BranchStream.cs" />
+    <Compile Include="IO\CircularBuffer.cs" />
+    <Compile Include="IO\CleanCloseStream.cs" />
+    <Compile Include="IO\ConcatStream.cs" />
+    <Compile Include="IO\EmptyStream.cs" />
+    <Compile Include="IO\NonClosableStream.cs" />
+    <Compile Include="IO\ProducerConsumerStream.cs" />
+    <Compile Include="IO\ReadOnlyStream.cs" />
+    <Compile Include="IO\StreamExtensions.cs" />
+  </ItemGroup>
+
 </Project>

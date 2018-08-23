@@ -3,23 +3,24 @@
 namespace SharpFileSystem.IO {
 
     public class EmptyStream : Stream {
-        private static EmptyStream _instance;
 
-        public static EmptyStream Instance { get { return _instance ?? (_instance = new EmptyStream()); } }
+        public static readonly EmptyStream Instance = new EmptyStream();
 
-        public override bool CanRead { get { return true; } }
+        #region Stream members
 
-        public override bool CanSeek { get { return true; } }
+        public override bool CanRead => true;
 
-        public override bool CanWrite { get { return true; } }
+        public override bool CanSeek => true;
+
+        public override bool CanWrite => true;
 
         public override void Flush() {
         }
 
-        public override long Length { get { return 0; } }
+        public override long Length => 0;
 
         public override long Position {
-            get { return 0; }
+            get => 0;
             set { }
         }
 
@@ -39,5 +40,7 @@ namespace SharpFileSystem.IO {
 
         public override void Close() {
         }
+
+        #endregion
     }
 }

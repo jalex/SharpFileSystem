@@ -4,10 +4,23 @@ using System.IO;
 namespace SharpFileSystem.IO {
 
     public class ConcatStream : Stream {
-        private long[] _offsets;
-        private Stream[] _streams;
-        private int _streamIndex = 0;
+        readonly long[] _offsets;
+        readonly Stream[] _streams;
+        int _streamIndex = 0;
+        readonly long _length;
 
+        #region properties
+
+        public Stream CurrentStream => _streams[_streamIndex];
+
+        public long CurrentStreamOffset => _offsets[_streamIndex];
+
+        #endregion
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="streams"></param>
         public ConcatStream(params Stream[] streams) {
             _offsets = new long[streams.Length];
             _streams = streams;
@@ -21,25 +34,22 @@ namespace SharpFileSystem.IO {
             }
         }
 
-        public Stream CurrentStream { get { return _streams[_streamIndex]; } }
+        #region Stream members
 
-        public long CurrentStreamOffset { get { return _offsets[_streamIndex]; } }
+        public override bool CanRead => true;
 
-        public override bool CanRead { get { return true; } }
+        public override bool CanSeek => true;
 
-        public override bool CanSeek { get { return true; } }
-
-        public override bool CanWrite { get { return false; } }
+        public override bool CanWrite => false;
 
         public override void Flush() {
             CurrentStream.Flush();
         }
 
-        private long _length;
-        public override long Length { get { return _length; } }
+        public override long Length => _length;
 
         public override long Position {
-            get { return CurrentStreamOffset + CurrentStream.Position; }
+            get => CurrentStreamOffset + CurrentStream.Position;
             set {
                 if(value < CurrentStreamOffset) {
                     do {
@@ -87,5 +97,7 @@ namespace SharpFileSystem.IO {
             foreach(var s in _streams) s.Close();
             base.Close();
         }
+
+        #endregion
     }
 }

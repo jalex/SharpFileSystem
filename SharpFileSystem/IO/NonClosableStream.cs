@@ -3,23 +3,28 @@
 namespace SharpFileSystem.IO {
 
     public class NonClosableStream : Stream {
-        private Stream _stream;
+        readonly Stream _stream;
 
-        public override bool CanRead { get { return _stream.CanRead; } }
-
-        public override bool CanSeek { get { return _stream.CanSeek; } }
-
-        public override bool CanWrite { get { return _stream.CanWrite; } }
-
-        public override long Length { get { return _stream.Length; } }
-
-        public override long Position {
-            get { return _stream.Position; }
-            set { _stream.Position = value; }
-        }
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public NonClosableStream(Stream stream) {
             _stream = stream;
+        }
+
+        #region Stream members
+
+        public override bool CanRead => _stream.CanRead;
+
+        public override bool CanSeek => _stream.CanSeek;
+
+        public override bool CanWrite => _stream.CanWrite;
+
+        public override long Length => _stream.Length;
+
+        public override long Position {
+            get => _stream.Position;
+            set => _stream.Position = value;
         }
 
         public override int Read(byte[] buffer, int offset, int count) {
@@ -44,5 +49,7 @@ namespace SharpFileSystem.IO {
 
         public override void Close() {
         }
+
+        #endregion
     }
 }
