@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
+using SharpFileSystem.IO;
 
 namespace SharpFileSystem.FileSystems.SharpZipLib {
 
@@ -19,11 +20,13 @@ namespace SharpFileSystem.FileSystems.SharpZipLib {
         }
 
         public static SharpZipLibFileSystem Open(Stream s) {
-            return new SharpZipLibFileSystem(new ZipFile(s));
+            var seeking = s.CanSeek ? s : new SeekStream(s);
+            return new SharpZipLibFileSystem(new ZipFile(seeking));
         }
 
         public static SharpZipLibFileSystem Create(Stream s) {
-            return new SharpZipLibFileSystem(ZipFile.Create(s));
+            var seeking = s.CanSeek ? s : new SeekStream(s);
+            return new SharpZipLibFileSystem(ZipFile.Create(seeking));
         }
 
         protected FileSystemPath ToPath(ZipEntry entry) {
@@ -61,9 +64,9 @@ namespace SharpFileSystem.FileSystems.SharpZipLib {
 
         public Stream CreateFile(FileSystemPath path) {
             var entry = new MemoryZipEntry();
-            ZipFile.BeginUpdate();
+            BeginUpdate();
             ZipFile.Add(entry, ToEntryPath(path));
-            ZipFile.CommitUpdate();
+            EndUpdate();
 
             return entry.GetSource();
         }
@@ -74,7 +77,9 @@ namespace SharpFileSystem.FileSystems.SharpZipLib {
         }
 
         public void CreateDirectory(FileSystemPath path) {
+            BeginUpdate();
             ZipFile.AddDirectory(ToEntryPath(path));
+            EndUpdate();
         }
 
         public void Delete(FileSystemPath path) {
@@ -84,6 +89,14 @@ namespace SharpFileSystem.FileSystems.SharpZipLib {
         public void Dispose() {
             if(ZipFile.IsUpdating) ZipFile.CommitUpdate();
             ZipFile.Close();
+        }
+
+        void BeginUpdate() {
+            if(!ZipFile.IsUpdating) ZipFile.BeginUpdate();
+        }
+
+        void EndUpdate() {
+            if(ZipFile.IsUpdating) ZipFile.CommitUpdate();
         }
 
         #region sub classes

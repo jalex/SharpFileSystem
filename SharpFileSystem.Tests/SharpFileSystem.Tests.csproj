@@ -49,6 +49,7 @@
     <Compile Include="FileSystems\EntityMoverRegistrationTest.cs" />
     <Compile Include="FileSystems\MemoryFileSystemTest.cs" />
     <Compile Include="FileSystems\PhysicalFileSystemTest.cs" />
+    <Compile Include="IO\SeekStreamTests.cs" />
     <Compile Include="NetZipArchive\NetZipArchiveFileSystemTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SharpZipLib\SharpZipLibFileSystemTest.cs" />

@@ -21,6 +21,7 @@
     <Compile Include="IO\NonClosableStream.cs" />
     <Compile Include="IO\ProducerConsumerStream.cs" />
     <Compile Include="IO\ReadOnlyStream.cs" />
+    <Compile Include="IO\SeekStream.cs" />
     <Compile Include="IO\StreamExtensions.cs" />
   </ItemGroup>
 
