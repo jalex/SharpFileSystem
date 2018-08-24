@@ -6,6 +6,7 @@ using System.Linq;
 namespace SharpFileSystem.FileSystems.NetZipArchive {
 
     public class NetZipArchiveFileSystem : IFileSystem {
+        readonly bool _leaveArhiveOpen;
 
         #region properties
 
@@ -16,7 +17,12 @@ namespace SharpFileSystem.FileSystems.NetZipArchive {
         /// <summary>
         /// Constructor
         /// </summary>
-        NetZipArchiveFileSystem(ZipArchive archive) {
+        /// <param name="archive">A <see cref="ZipArchive"/> object.</param>
+        /// <param name="leaveArhiveOpen">
+        /// <see langword="true"/> to leave the archive open after the <see cref="NetZipArchiveFileSystem"/> object is disposed; otherwise, <see langword="false"/>.
+        /// </param>
+        public NetZipArchiveFileSystem(ZipArchive archive, bool leaveArhiveOpen = false) {
+            _leaveArhiveOpen = leaveArhiveOpen;
             this.ZipArchive = archive;
         }
 
@@ -84,7 +90,7 @@ namespace SharpFileSystem.FileSystems.NetZipArchive {
         }
 
         public void Dispose() {
-            ZipArchive.Dispose();
+            if(!_leaveArhiveOpen) ZipArchive.Dispose();
         }
     }
 }

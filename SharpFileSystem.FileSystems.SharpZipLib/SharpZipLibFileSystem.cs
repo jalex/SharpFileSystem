@@ -3,30 +3,59 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
-using SharpFileSystem.IO;
 
 namespace SharpFileSystem.FileSystems.SharpZipLib {
 
     public class SharpZipLibFileSystem : IFileSystem {
+        readonly bool _leaveArhiveOpen;
 
         #region properties
 
+        /// <summary>
+        /// The <see cref="ZipFile"/> the object that was used to create this <see cref="SharpZipLibFileSystem"/> object.
+        /// </summary>
         public ZipFile ZipFile { get; }
 
         #endregion
 
-        private SharpZipLibFileSystem(ZipFile zipFile) {
+        /// <summary>
+        /// Creates the new <see cref="SharpZipLibFileSystem"/> object.
+        /// </summary>
+        /// <param name="archive">A <see cref="ZipFile"/> object.</param>
+        /// <param name="leaveArhiveOpen">
+        /// <see langword="true"/> to leave the archive open after the <see cref="SharpZipLibFileSystem"/> object is disposed; otherwise, <see langword="false"/>.
+        /// </param>
+        public SharpZipLibFileSystem(ZipFile zipFile, bool leaveArhiveOpen = false) {
+            _leaveArhiveOpen = leaveArhiveOpen;
             this.ZipFile = zipFile;
         }
 
-        public static SharpZipLibFileSystem Open(Stream s) {
-            var seeking = s.CanSeek ? s : new SeekStream(s);
-            return new SharpZipLibFileSystem(new ZipFile(seeking));
+        /// <summary>
+        /// Opens the <see cref="SharpZipLibFileSystem"/> for reading from the specified archive stream.
+        /// </summary>
+        public static SharpZipLibFileSystem Open(Stream archiveStream, string password = null) {
+            var zipFile = new ZipFile(archiveStream);
+            try {
+                if(password != null) zipFile.Password = password;
+                return new SharpZipLibFileSystem(zipFile);
+            } catch {
+                ((IDisposable)zipFile).Dispose();
+                throw;
+            }
         }
 
-        public static SharpZipLibFileSystem Create(Stream s) {
-            var seeking = s.CanSeek ? s : new SeekStream(s);
-            return new SharpZipLibFileSystem(ZipFile.Create(seeking));
+        /// <summary>
+        /// Creates the <see cref="SharpZipLibFileSystem"/> for writing to the specified archive stream.
+        /// </summary>
+        public static SharpZipLibFileSystem Create(Stream archiveStream, string password = null) {
+            var zipFile = ZipFile.Create(archiveStream);
+            try {
+                if(password != null) zipFile.Password = password;
+                return new SharpZipLibFileSystem(zipFile);
+            } catch {
+                ((IDisposable)zipFile).Dispose();
+                throw;
+            }
         }
 
         protected FileSystemPath ToPath(ZipEntry entry) {
