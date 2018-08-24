@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpFileSystem.FileSystems
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpFileSystem.Tests", "SharpFileSystem.Tests\SharpFileSystem.Tests.csproj", "{44371EC6-F452-4954-98C1-BD69A0D7FC6C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpFileSystem.FileSystems.NetZipArchive", "SharpFileSystem.FileSystems.NetZipArchive\SharpFileSystem.FileSystems.NetZipArchive.csproj", "{5D1559FC-1B8F-451E-8402-48693FF542A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{44371EC6-F452-4954-98C1-BD69A0D7FC6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44371EC6-F452-4954-98C1-BD69A0D7FC6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44371EC6-F452-4954-98C1-BD69A0D7FC6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D1559FC-1B8F-451E-8402-48693FF542A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D1559FC-1B8F-451E-8402-48693FF542A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D1559FC-1B8F-451E-8402-48693FF542A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D1559FC-1B8F-451E-8402-48693FF542A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
