@@ -11,9 +11,9 @@ namespace SharpFileSystem {
     public static class FileSystemExtensions {
 
         /// <summary>
-        /// Opens this <see cref="File"/>.
+        /// Opens this <see cref="FileSystemFile"/>.
         /// </summary>
-        public static Stream Open(this File file, FileAccess access) {
+        public static Stream Open(this FileSystemFile file, FileAccess access) {
             return file.FileSystem.OpenFile(file.Path, access);
         }
 
@@ -25,16 +25,16 @@ namespace SharpFileSystem {
         }
 
         /// <summary>
-        /// Gets a collection of entities in this <see cref="Directory"/>.
+        /// Gets a collection of entities in this <see cref="FileSystemDirectory"/>.
         /// </summary>
-        public static ICollection<FileSystemPath> GetEntityPaths(this Directory directory) {
+        public static ICollection<FileSystemPath> GetEntityPaths(this FileSystemDirectory directory) {
             return directory.FileSystem.GetEntities(directory.Path);
         }
 
         /// <summary>
-        /// Gets a collection of entities in this <see cref="Directory"/>.
+        /// Gets a collection of entities in this <see cref="FileSystemDirectory"/>.
         /// </summary>
-        public static ICollection<FileSystemEntity> GetEntities(this Directory directory) {
+        public static ICollection<FileSystemEntity> GetEntities(this FileSystemDirectory directory) {
             var paths = directory.GetEntityPaths();
             return new EnumerableCollection<FileSystemEntity>(paths.Select(p => FileSystemEntity.Create(directory.FileSystem, p)), paths.Count);
         }
@@ -126,42 +126,42 @@ namespace SharpFileSystem {
         /// <summary>
         /// Moves this directory to a destination directory.
         /// </summary>
-        public static void MoveTo(this Directory source, Directory destination) {
+        public static void MoveTo(this FileSystemDirectory source, FileSystemDirectory destination) {
             source.FileSystem.Move(source.Path, destination.FileSystem, destination.Path.AppendDirectory(source.Path.EntityName));
         }
 
         /// <summary>
         /// Moves this directory to a destination directory (async).
         /// </summary>
-        public static Task MoveToAsync(this Directory source, Directory destination) {
+        public static Task MoveToAsync(this FileSystemDirectory source, FileSystemDirectory destination) {
             return source.MoveToAsync(destination, CancellationToken.None);
         }
 
         /// <summary>
         /// Moves this directory to a destination directory (async with cancellation token).
         /// </summary>
-        public static Task MoveToAsync(this Directory source, Directory destination, CancellationToken cancellationToken) {
+        public static Task MoveToAsync(this FileSystemDirectory source, FileSystemDirectory destination, CancellationToken cancellationToken) {
             return source.FileSystem.MoveAsync(source.Path, destination.FileSystem, destination.Path.AppendDirectory(source.Path.EntityName), cancellationToken);
         }
 
         /// <summary>
         /// Moves this file to a destination directory.
         /// </summary>
-        public static void MoveTo(this File source, Directory destination) {
+        public static void MoveTo(this FileSystemFile source, FileSystemDirectory destination) {
             source.FileSystem.Move(source.Path, destination.FileSystem, destination.Path.AppendFile(source.Path.EntityName));
         }
 
         /// <summary>
         /// Moves this file to a destination directory (async).
         /// </summary>
-        public static Task MoveToAsync(this File source, Directory destination) {
+        public static Task MoveToAsync(this FileSystemFile source, FileSystemDirectory destination) {
             return source.MoveToAsync(destination, CancellationToken.None);
         }
 
         /// <summary>
         /// Moves this file to a destination directory (async with cancellation token).
         /// </summary>
-        public static Task MoveToAsync(this File source, Directory destination, CancellationToken cancellationToken) {
+        public static Task MoveToAsync(this FileSystemFile source, FileSystemDirectory destination, CancellationToken cancellationToken) {
             return source.FileSystem.MoveAsync(source.Path, destination.FileSystem, destination.Path.AppendFile(source.Path.EntityName), cancellationToken);
         }
 
@@ -227,42 +227,42 @@ namespace SharpFileSystem {
         /// <summary>
         /// Copies this directory to a destination directory.
         /// </summary>
-        public static void CopyTo(this Directory source, Directory destination) {
+        public static void CopyTo(this FileSystemDirectory source, FileSystemDirectory destination) {
             source.FileSystem.Copy(source.Path, destination.FileSystem, destination.Path.AppendDirectory(source.Path.EntityName));
         }
 
         /// <summary>
         /// Copies this directory to a destination directory (async).
         /// </summary>
-        public static Task CopyToAsync(this Directory source, Directory destination) {
+        public static Task CopyToAsync(this FileSystemDirectory source, FileSystemDirectory destination) {
             return source.CopyToAsync(destination, CancellationToken.None);
         }
 
         /// <summary>
         /// Copies this directory to a destination directory (async with cancellation token).
         /// </summary>
-        public static Task CopyToAsync(this Directory source, Directory destination, CancellationToken cancellationToken) {
+        public static Task CopyToAsync(this FileSystemDirectory source, FileSystemDirectory destination, CancellationToken cancellationToken) {
             return source.FileSystem.CopyAsync(source.Path, destination.FileSystem, destination.Path.AppendDirectory(source.Path.EntityName), cancellationToken);
         }
 
         /// <summary>
         /// Copies this file to a destination directory.
         /// </summary>
-        public static void CopyTo(this File source, Directory destination) {
+        public static void CopyTo(this FileSystemFile source, FileSystemDirectory destination) {
             source.FileSystem.Copy(source.Path, destination.FileSystem, destination.Path.AppendFile(source.Path.EntityName));
         }
 
         /// <summary>
         /// Copies this file to a destination directory (async).
         /// </summary>
-        public static Task CopyToAsync(this File source, Directory destination) {
+        public static Task CopyToAsync(this FileSystemFile source, FileSystemDirectory destination) {
             return source.CopyToAsync(destination, CancellationToken.None);
         }
 
         /// <summary>
         /// Copies this file to a destination directory (async with cancellation token).
         /// </summary>
-        public static Task CopyToAsync(this File source, Directory destination, CancellationToken cancellationToken) {
+        public static Task CopyToAsync(this FileSystemFile source, FileSystemDirectory destination, CancellationToken cancellationToken) {
             return source.FileSystem.CopyAsync(source.Path, destination.FileSystem, destination.Path.AppendFile(source.Path.EntityName), cancellationToken);
         }
 

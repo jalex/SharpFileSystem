@@ -46,39 +46,39 @@ namespace SharpFileSystem.FileSystems {
 
         public ICollection<FileSystemPath> GetEntities(FileSystemPath path) {
             string physicalPath = GetPhysicalPath(path);
-            string[] directories = System.IO.Directory.GetDirectories(physicalPath);
-            string[] files = System.IO.Directory.GetFiles(physicalPath);
+            string[] directories = Directory.GetDirectories(physicalPath);
+            string[] files = Directory.GetFiles(physicalPath);
             var virtualDirectories = directories.Select(p => GetVirtualDirectoryPath(p));
             var virtualFiles = files.Select(p => GetVirtualFilePath(p));
             return new EnumerableCollection<FileSystemPath>(virtualDirectories.Concat(virtualFiles), directories.Length + files.Length);
         }
 
         public bool Exists(FileSystemPath path) {
-            return path.IsFile ? System.IO.File.Exists(GetPhysicalPath(path)) : System.IO.Directory.Exists(GetPhysicalPath(path));
+            return path.IsFile ? File.Exists(GetPhysicalPath(path)) : Directory.Exists(GetPhysicalPath(path));
         }
 
         public Stream CreateFile(FileSystemPath path) {
             if(!path.IsFile) throw new ArgumentException("The specified path is not a file.", nameof(path));
             var physicalPath = GetPhysicalPath(path);
             EnsureDirectoryExist(physicalPath);
-            return System.IO.File.Create(physicalPath);
+            return File.Create(physicalPath);
         }
 
         public Stream OpenFile(FileSystemPath path, FileAccess access) {
             if(!path.IsFile) throw new ArgumentException("The specified path is not a file.", nameof(path));
-            return System.IO.File.Open(GetPhysicalPath(path), FileMode.Open, access);
+            return File.Open(GetPhysicalPath(path), FileMode.Open, access);
         }
 
         public void CreateDirectory(FileSystemPath path) {
             if(!path.IsDirectory) throw new ArgumentException("The specified path is not a directory.", nameof(path));
-            System.IO.Directory.CreateDirectory(GetPhysicalPath(path));
+            Directory.CreateDirectory(GetPhysicalPath(path));
         }
 
         public void Delete(FileSystemPath path) {
             if(path.IsFile) {
-                System.IO.File.Delete(GetPhysicalPath(path));
+                File.Delete(GetPhysicalPath(path));
             } else {
-                System.IO.Directory.Delete(GetPhysicalPath(path), true);
+                Directory.Delete(GetPhysicalPath(path), true);
             }
         }
 
@@ -87,7 +87,7 @@ namespace SharpFileSystem.FileSystems {
 
         void EnsureDirectoryExist(string path) {
             var dir = Path.GetDirectoryName(path);
-            System.IO.Directory.CreateDirectory(dir);
+            Directory.CreateDirectory(dir);
         }
     }
 }

@@ -5,13 +5,13 @@ namespace SharpFileSystem {
     /// <summary>
     /// File system file class.
     /// </summary>
-    public class File : FileSystemEntity, IEquatable<File> {
+    public class FileSystemFile : FileSystemEntity, IEquatable<FileSystemFile> {
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public File(IFileSystem fileSystem, FileSystemPath path) : base(fileSystem, path) {
-            if(!path.IsFile) throw new ArgumentException("The specified path is no file.", "path");
+        public FileSystemFile(IFileSystem fileSystem, FileSystemPath path) : base(fileSystem, path) {
+            if(!path.IsFile) throw new ArgumentException("The specified path is no file.", nameof(path));
         }
 
         #region equals support
@@ -19,7 +19,7 @@ namespace SharpFileSystem {
         /// <summary>
         /// Return true if the specified object is equal to the current object; otherwise, false.
         /// </summary>
-        public bool Equals(File other) {
+        public bool Equals(FileSystemFile other) {
             return ((IEquatable<FileSystemEntity>)this).Equals(other);
         }
 

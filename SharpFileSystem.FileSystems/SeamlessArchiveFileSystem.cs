@@ -7,7 +7,7 @@ namespace SharpFileSystem.FileSystems {
 
     public abstract class SeamlessArchiveFileSystem: IFileSystem {
         readonly FileSystemUsage _rootUsage;
-        readonly IDictionary<File, FileSystemUsage> _usedArchives = new Dictionary<File, FileSystemUsage>();
+        readonly IDictionary<FileSystemFile, FileSystemUsage> _usedArchives = new Dictionary<FileSystemFile, FileSystemUsage>();
 
         #region properties
 
@@ -78,10 +78,10 @@ namespace SharpFileSystem.FileSystems {
         }
 
         FileSystemReference CreateArchiveReference(FileSystemPath archiveFile) {
-            return CreateReference((File)GetActualLocation(archiveFile));
+            return CreateReference((FileSystemFile)GetActualLocation(archiveFile));
         }
 
-        FileSystemReference CreateReference(File file) {
+        FileSystemReference CreateReference(FileSystemFile file) {
             var usage = GetArchiveFs(file);
             var reference = new FileSystemReference(usage);
             usage.References.Add(reference);
@@ -90,12 +90,12 @@ namespace SharpFileSystem.FileSystems {
 
         FileSystemEntity GetActualLocation(FileSystemPath path) {
             if(!TryGetArchivePath(path, out var archivePath)) return FileSystemEntity.Create(FileSystem, path);
-            var archiveFile = (File)GetActualLocation(archivePath);
+            var archiveFile = (FileSystemFile)GetActualLocation(archivePath);
             var usage = GetArchiveFs(archiveFile);
             return FileSystemEntity.Create(usage.FileSystem, GetRelativePath(path));
         }
 
-        FileSystemUsage GetArchiveFs(File archiveFile) {
+        FileSystemUsage GetArchiveFs(FileSystemFile archiveFile) {
             if(_usedArchives.TryGetValue(archiveFile, out var usage)) {
                 //System.Diagnostics.Debug.WriteLine("Open archives: " + _usedArchives.Count);
                 return usage;
@@ -112,7 +112,7 @@ namespace SharpFileSystem.FileSystems {
             return usage;
         }
 
-        protected abstract IFileSystem CreateArchiveFileSystem(File archiveFile);
+        protected abstract IFileSystem CreateArchiveFileSystem(FileSystemFile archiveFile);
 
         public ICollection<FileSystemPath> GetEntities(FileSystemPath path) {
             using(var r = Refer(path)) {
@@ -201,7 +201,7 @@ namespace SharpFileSystem.FileSystems {
 
         public class FileSystemUsage {
             public SeamlessArchiveFileSystem Owner { get; set; }
-            public File ArchiveFile { get; set; }
+            public FileSystemFile ArchiveFile { get; set; }
             public IFileSystem FileSystem { get; set; }
             public ICollection<FileSystemReference> References { get; } = new LinkedList<FileSystemReference>();
         }

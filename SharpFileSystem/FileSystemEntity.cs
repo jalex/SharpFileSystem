@@ -39,9 +39,9 @@ namespace SharpFileSystem {
         /// </summary>
         public static FileSystemEntity Create(IFileSystem fileSystem, FileSystemPath path) {
             if(path.IsFile) {
-                return new File(fileSystem, path);
+                return new FileSystemFile(fileSystem, path);
             } else {
-                return new Directory(fileSystem, path);
+                return new FileSystemDirectory(fileSystem, path);
             }
         }
 

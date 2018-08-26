@@ -49,19 +49,33 @@ namespace SharpFileSystem.FileSystems.SevenZip {
             return FileSystemPath.Parse(path);
         }
 
+        #region IFileSystem members 
+
+        /// <summary>
+        /// Gets a collection of entities in the specified <see cref="FileSystemPath"/>.
+        /// </summary>
         public ICollection<FileSystemPath> GetEntities(FileSystemPath path) {
             if(!path.IsDirectory) throw new ArgumentException("The specified path is not a directory.", nameof(path));
             return _entities.Where(p => !p.IsRoot && p.ParentPath.Equals(path)).ToArray();
         }
 
+        /// <summary>
+        /// Returns true if the specified <see cref="FileSystemPath"/> exists; otherwise, false.
+        /// </summary>
         public bool Exists(FileSystemPath path) {
             return _entities.Contains(path);
         }
 
+        /// <summary>
+        /// Creates or overwrites a file in the specified <see cref="FileSystemPath"/>.
+        /// </summary>
         public Stream CreateFile(FileSystemPath path) {
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Opens a file on the specified <see cref="FileSystemPath"/>.
+        /// </summary>
         public Stream OpenFile(FileSystemPath path, FileAccess access) {
             if(access == FileAccess.Write) throw new NotSupportedException();
 
@@ -73,16 +87,31 @@ namespace SharpFileSystem.FileSystems.SevenZip {
             return s;
         }
 
+        /// <summary>
+        /// Creates or overwrites a directory in the specified <see cref="FileSystemPath"/>.
+        /// </summary>
         public void CreateDirectory(FileSystemPath path) {
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Deletes an entity on the specified <see cref="FileSystemPath"/>.
+        /// </summary>
         public void Delete(FileSystemPath path) {
             throw new NotSupportedException();
         }
 
+        #endregion
+
+        #region IDisposable members
+
+        /// <summary>
+        /// Dispose this <see cref="SevenZipFileSystem"/>.
+        /// </summary>
         public void Dispose() {
             _extractor.Dispose();
         }
+
+        #endregion
     }
 }
